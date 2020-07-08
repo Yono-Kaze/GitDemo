@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springboot.mybatis.dao.EmployeeMapper">
+  <resultMap id="BaseResultMap" type="com.springboot.bean.Employee">
+    <id column="empid" jdbcType="INTEGER" property="empid" />
+    <result column="empname" jdbcType="VARCHAR" property="empname" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="date" jdbcType="DATE" property="date" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="did" jdbcType="INTEGER" property="did" />
+  </resultMap>
+  
+<!-- 关联部门表的查询结果 -->  
+  <resultMap id="WithDeptResultMap" type="com.springboot.bean.Employee">
+    <id column="empid" jdbcType="INTEGER" property="empid" />
+    <result column="empname" jdbcType="VARCHAR" property="empname" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="date" jdbcType="DATE" property="date" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="did" jdbcType="INTEGER" property="did" />
+ 	<!-- 指定联合查询出部门字段的封装 -->
+    <association property="department" javaType="com.springboot.bean.Department">
+    	<id column="deptid" property="deptid"/>
+    	<result column="deptname" property="deptname"/>
+    </association>
+  </resultMap>  
+  
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    empid, empname, sex, date, phone, did
+  </sql>
+<!-- 联合查询的列表 -->
+  <sql id="WithDept_Column_List">
+        emp.empid,emp.empname, emp.sex,emp.date,emp.phone, emp.did, dept.deptid,dept.deptname
+  </sql>
+
+ <!-- 关联上部门信息的查询 
+List<Employee> selectByExampleWithDept(EmployeeExample example);
+Employee selectByPrimaryKeyWithDept(Integer empid);
+ -->    
+   <select id="selectByExampleWithDept" parameterType="com.springboot.bean.EmployeeExample" resultMap="WithDeptResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithDept_Column_List" />
+	FROM
+	    `manger`.`emp` emp
+	        LEFT JOIN
+	    `manger`.`dept` dept ON emp.did = dept.deptid
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithDept" parameterType="java.lang.Integer" resultMap="WithDeptResultMap">
+    select 
+    <include refid="WithDept_Column_List" />
+    	FROM
+	    `manger`.`emp` emp
+	        LEFT JOIN
+	    `manger`.`dept` dept ON emp.did = dept.deptid
+    where empid = #{empid,jdbcType=INTEGER}
+  </select>  
+  
+  <select id="selectByExample" parameterType="com.springboot.bean.EmployeeExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from emp
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp
+    where empid = #{empid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from emp
+    where empid = #{empid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.springboot.bean.EmployeeExample">
+    delete from emp
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.springboot.bean.Employee">
+    insert into emp (empid, empname, sex, 
+      date, phone, did)
+    values (#{empid,jdbcType=INTEGER}, #{empname,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
+      #{date,jdbcType=DATE}, #{phone,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.springboot.bean.Employee">
+    insert into emp
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="empid != null">
+        empid,
+      </if>
+      <if test="empname != null">
+        empname,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="did != null">
+        did,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="empid != null">
+        #{empid,jdbcType=INTEGER},
+      </if>
+      <if test="empname != null">
+        #{empname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="did != null">
+        #{did,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.springboot.bean.EmployeeExample" resultType="java.lang.Long">
+    select count(*) from emp
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update emp
+    <set>
+      <if test="record.empid != null">
+        empid = #{record.empid,jdbcType=INTEGER},
+      </if>
+      <if test="record.empname != null">
+        empname = #{record.empname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null">
+        sex = #{record.sex,jdbcType=INTEGER},
+      </if>
+      <if test="record.date != null">
+        date = #{record.date,jdbcType=DATE},
+      </if>
+      <if test="record.phone != null">
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.did != null">
+        did = #{record.did,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update emp
+    set empid = #{record.empid,jdbcType=INTEGER},
+      empname = #{record.empname,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=INTEGER},
+      date = #{record.date,jdbcType=DATE},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      did = #{record.did,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.springboot.bean.Employee">
+    update emp
+    <set>
+      <if test="empname != null">
+        empname = #{empname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=DATE},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="did != null">
+        did = #{did,jdbcType=INTEGER},
+      </if>
+    </set>
+    where empid = #{empid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.springboot.bean.Employee">
+    update emp
+    set empname = #{empname,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      date = #{date,jdbcType=DATE},
+      phone = #{phone,jdbcType=VARCHAR},
+      did = #{did,jdbcType=INTEGER}
+    where empid = #{empid,jdbcType=INTEGER}
+  </update>
+</mapper>
