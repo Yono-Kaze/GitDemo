@@ -19,5 +19,10 @@ public class DepartmentService {
 		// TODO Auto-generated method stub		
 		return departmentMapper.selectByExample(null);
 	}
+	//获得所有部门信息
+	public List<Department> getAll() {
+		// TODO Auto-generated method stub
+		return departmentMapper.selectByExample(null);
+	}
 
 }
