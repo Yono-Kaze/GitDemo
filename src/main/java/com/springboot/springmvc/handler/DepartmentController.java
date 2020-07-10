@@ -2,11 +2,15 @@ package com.springboot.springmvc.handler;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +55,35 @@ public class DepartmentController {
 		  logger.debug(Msg.success().add("pageInfo",page).toString()); 
 		  return Msg.success().add("pageInfo", page);
 
+	}
+	/* 添加部门
+	 * 
+	 *  */
+	@RequestMapping(value="/adddept",method = RequestMethod.POST)
+	public Msg saveDept(@Valid Department department) {
+		departmentService.saveDept(department);
+		return Msg.success();
+	}
+	
+	//检查部门名是否重复
+	@RequestMapping("/checkdept")
+	public Msg checkUser(String deptName) {
+		//数据库用户查重
+		logger.info(deptName);
+		boolean b=departmentService.checkDept(deptName);
+		if(b) {
+			return Msg.success();
+		}else {
+			return Msg.fail().add("va_msg", "用户名已存在");
+		}
+		
+	}
+	
+	//根据id查询部门
+	@RequestMapping(value = "/dept/{id}",method = RequestMethod.GET)
+	public Msg getDept(@PathVariable("id") Integer id) {
+		Department department=departmentService.getDept(id);
+		return Msg.success().add("dept", department);
 	}
 	
 	
