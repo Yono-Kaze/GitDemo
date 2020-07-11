@@ -49,5 +49,11 @@ public class DepartmentService {
 		Department department=departmentMapper.selectByPrimaryKey(id);
 		return department;
 	}
+	//更新员工
+	public void updaeDept(Department department) {
+		// TODO Auto-generated method stub
+		departmentMapper.updateByPrimaryKeySelective(department);
+		
+	}
 
 }

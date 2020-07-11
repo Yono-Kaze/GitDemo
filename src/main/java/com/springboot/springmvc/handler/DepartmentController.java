@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +61,7 @@ public class DepartmentController {
 	 * 
 	 *  */
 	@RequestMapping(value="/adddept",method = RequestMethod.POST)
-	public Msg saveDept(@Valid Department department) {
+	public Msg saveDept(@Valid Department department,BindingResult result) {
 		departmentService.saveDept(department);
 		return Msg.success();
 	}
@@ -84,6 +85,13 @@ public class DepartmentController {
 	public Msg getDept(@PathVariable("id") Integer id) {
 		Department department=departmentService.getDept(id);
 		return Msg.success().add("dept", department);
+	}
+	//更新部门
+	@RequestMapping(value = "/dept/{id}",method = RequestMethod.PUT)
+	public Msg saveDept(Department department) {
+		logger.info("将要更新的数据"+department);
+		departmentService.updaeDept(department);
+		return Msg.success();
 	}
 	
 	
