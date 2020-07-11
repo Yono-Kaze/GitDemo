@@ -1,0 +1,21 @@
+#配置服务器信息
+server:
+  port: 8001
+  
+#数据库连接池
+spring:  datasource:    name: mydb
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/manger?serverTimezone=UTC
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mvc:    hiddenmethod:      filter:        enabled: true
+#mybatis配置
+mybatis:  type-aliases-package: com.springboot.mybatis.dao
+  mapper-locations: classpath:mapper/*.xml
+#分页插件
+pagehelper:  reasonable: true
+#日志输出配置
+logging:  level:
+    root: info    com.springboot.springmvc.handler: info
+    
