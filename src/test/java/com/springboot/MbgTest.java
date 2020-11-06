@@ -9,6 +9,13 @@ import org.mybatis.generator.config.Configuration;
 import org.mybatis.generator.config.xml.ConfigurationParser;
 import org.mybatis.generator.internal.DefaultShellCallback;
 
+/**
+ * 
+ *<p>Description:mybatis逆向工程<p>	
+ * @author Administrator
+ * @version 2020-11-6
+ *
+ */
 public class MbgTest {
 	
 	public static void main(String[] args) throws Exception {
